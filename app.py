@@ -15,7 +15,7 @@ from botbuilder.core import (
 from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots.bot import MyBot
+from bots.bot_main import MyBot
 
 
 from config import DefaultConfig
