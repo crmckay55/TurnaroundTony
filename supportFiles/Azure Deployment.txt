@@ -1,0 +1,25 @@
+az login
+
+
+az account set --subscription "Turnaround Management"
+
+az ad app create --display-name "appTurnaroundBot-v4" --password "1234567890123456" --available-to-other-tenants
+
+appID: d13aff78-044f-43b2-9265-f90bd3d8639d
+Pwd: 1234567890123456
+
+Existing Group, Existing App Service Plan:
+------------------------------------------
+az group deployment create --resource-group "TurnaroundBot" --template-file "C:\PythonEnvironments\TurnaroundBot\deploymentTemplates\template-with-preexisting-rg.json" --parameters appId="d13aff78-044f-43b2-9265-f90bd3d8639d" appSecret="1234567890123456" botId="botTurnaroundBot-v4" newWebAppName="waTurnaroundBot-v4" existingAppServicePlan="aspTurnaroundBot-v4" appServicePlanLocation="canadacentral" --name "asTurnaroundBot-v4"
+
+az webapp deployment source config-zip --resource-group "TurnaroundBot" --name "waTurnaroundBot-v4" --src "C:\PythonEnvironments\TurnaroundBot\zipTurnaroundBot.zip"
+
+
+Alternate Deployment Methods:
+-----------------------------
+
+New Group:
+az deployment create --template-file "C:\PythonEnvironments\TurnaroundBot\deploymentTemplates\template-with-new-rg.json" --location canadacentral --parameters appId="c0ead22e-18f7-450a-a859-f6e37427d852" appSecret="1234567890123456" botId="botTurnaroundBot" botSku=F0 newAppServicePlanName="aspTurnaroundBot" newWebAppName="waTurnaroundBot" groupName="TurnaroundBot" groupLocation="canadacentral" newAppServicePlanLocation="canadacentral" --name "asTurnaroundBot"
+
+Existing Group, New App Service Plan:
+az group deployment create --resource-group "TurnaroundBot" --template-file "C:\PythonEnvironments\TurnaroundBot\deploymentTemplates\template-with-preexisting-rg.json" --parameters appId="e532500b-c57d-41a4-a632-24bf386c7af1" appSecret="1234567890123456" botId="botTurnaroundBot" newWebAppName="waTurnaroundBot-v2" newAppServicePlanName="aspTurnaroundBot-v2" appServicePlanLocation="canadacentral" --name "aspTurnaroundBot"
