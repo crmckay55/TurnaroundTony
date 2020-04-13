@@ -3,6 +3,7 @@
 
 from botbuilder.core import ActivityHandler, TurnContext
 from botbuilder.schema import ChannelAccount
+from helpers.helper_luis import LuisHelper
 
 
 class MyBot(ActivityHandler):
@@ -11,6 +12,12 @@ class MyBot(ActivityHandler):
     async def on_message_activity(self, turn_context: TurnContext):
 
         await turn_context.send_activity(f"You said '{turn_context.activity.text}'")
+
+        lh = LuisHelper()
+        lh.predict(turn_context.activity.text)
+        await turn_context.send_activity(f"The top intent was: {lh.top_intent}")
+        await turn_context.send_activity(f"Your Sentiment was: {lh.sentiment}")
+        await turn_context.send_activity(f"And entities are: {lh.entities['subject']}")
 
     async def on_members_added_activity(
             self,
