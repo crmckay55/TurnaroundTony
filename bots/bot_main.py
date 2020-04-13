@@ -6,6 +6,7 @@ from botbuilder.schema import ChannelAccount
 from helpers.helper_luis import LuisHelper
 from helpers.helper_cogsearch import CogSearchHelper
 
+
 class MyBot(ActivityHandler):
     # See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
 
@@ -15,19 +16,18 @@ class MyBot(ActivityHandler):
 
         lh = LuisHelper()
         lh.predict(turn_context.activity.text)
-        await turn_context.send_activity(f"The top intent was: {lh.top_intent}")
-        await turn_context.send_activity(f"Your Sentiment was: {lh.sentiment}")
-        await turn_context.send_activity(f"And entities are: {lh.entities}")
+        # await turn_context.send_activity(f"The top intent was: {lh.top_intent}")
+        # await turn_context.send_activity(f"Your Sentiment was: {lh.sentiment}")
+        # await turn_context.send_activity(f"And entities are: {lh.entities}")
         # TODO: Better error trapping, and handling of different bots and helpers
 
-
         cs = CogSearchHelper()
-
 
         cs.search(lh.entities)
 
         for idx, row in cs.results.iterrows():
-            await turn_context.send_activity(f"Search result: {row['title']}, {row['url']}")
+            await turn_context.send_activity({row['title']})
+            await turn_context.send_activity({row['url']})
 
     async def on_members_added_activity(
             self,
