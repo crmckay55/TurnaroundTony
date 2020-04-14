@@ -1,4 +1,4 @@
-from helpers.helper_luis import LuisHelper
+from helpers.luis import LuisHelper
 from config import DefaultConfig
 
 

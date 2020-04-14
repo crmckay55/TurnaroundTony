@@ -3,8 +3,8 @@
 
 from botbuilder.core import ActivityHandler, TurnContext
 from botbuilder.schema import ChannelAccount
-from helpers.helper_luis import LuisHelper
-from helpers.helper_cogsearch import CogSearchHelper
+from helpers.luis import LuisHelper
+from helpers.cogsearch import CogSearchHelper
 
 
 class MyBot(ActivityHandler):
@@ -26,8 +26,9 @@ class MyBot(ActivityHandler):
         cs.search(lh.entities)
 
         for idx, row in cs.results.iterrows():
-            await turn_context.send_activity({row['title']})
-            await turn_context.send_activity({row['url']})
+            print(row)
+            await turn_context.send_activity(f"Title : {row['title']}, {row['url']}")
+
 
     async def on_members_added_activity(
             self,
