@@ -17,7 +17,7 @@ class DefaultConfig:
     LUIS_APP_ID = os.environ.get("LuisAppId", "")
     LUIS_API_KEY = os.environ.get("LuisAPIKey", "")
     LUIS_API_HOST_NAME = os.environ.get("LuisAPIHostName", "")
-    LUIS_SLOT = 'staging'
+    LUIS_SLOT = 'production'
 
     COG_SEARCH_KEY = os.environ.get("CogSearchKey", "")
     COG_SEARCH_HOST_NAME = os.environ.get("CogSearchHostName", "")

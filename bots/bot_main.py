@@ -25,10 +25,10 @@ class MyBot(ActivityHandler):
 
         cs.search(lh.entities)
 
-        for idx, row in cs.results.iterrows():
-            print(row)
-            await turn_context.send_activity(f"Title : {row['title']}, {row['url']}")
 
+        for idx, row in cs.results.iterrows():
+            await turn_context.send_activity(f"Title : {row['title']}")
+            await turn_context.send_activity(f"URL : {row['url']}")
 
     async def on_members_added_activity(
             self,
