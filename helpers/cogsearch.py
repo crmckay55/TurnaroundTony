@@ -22,7 +22,9 @@ class CogSearchHelper:
         """terms: list of terms to search for"""
 
         for search_term in terms:
-            url = self.runtime_endpoint + self.runtime_index + "?api-version=" + self.runtime_version + "&search=" + search_term
+            url = self.runtime_endpoint + self.runtime_index + "?api-version=" \
+                  + self.runtime_version + "&search=" + search_term
+
             print(url)
             response = requests.get(url, headers=self.headers)
             index_list = response.json()

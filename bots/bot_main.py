@@ -16,6 +16,7 @@ class MyBot(ActivityHandler):
 
         lh = LuisHelper()
         lh.predict(turn_context.activity.text)
+        await turn_context.send_activity(f"REST: {lh.predict_rest(turn_context.activity.text)}")
         # await turn_context.send_activity(f"The top intent was: {lh.top_intent}")
         # await turn_context.send_activity(f"Your Sentiment was: {lh.sentiment}")
         # await turn_context.send_activity(f"And entities are: {lh.entities}")
