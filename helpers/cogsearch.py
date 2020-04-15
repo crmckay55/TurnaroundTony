@@ -46,4 +46,6 @@ class CogSearchHelper:
         if len(self.results) > 0:
             found_docs = True
 
+        # TODO: seperate searching for task number vs. subject
+
         return found_docs

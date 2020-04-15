@@ -32,7 +32,7 @@ class MyBot(ActivityHandler):
                 else:
                     await turn_context.send_activity(f"I found these documents about {entity['text']}")
                     for idx, result in cs.results.iterrows():
-                        await turn_context.send_activity(f"[{result['title']}]({result['url']})")
+                        await turn_context.send_activity(f"[{result['title']}]({result['url']}) - score: {result['@search.score']}")
 
     async def on_members_added_activity(
             self,
