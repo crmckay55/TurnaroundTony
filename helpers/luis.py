@@ -9,26 +9,42 @@ import json
 
 
 class LuisHelper:
+    """Object to call LUIS and store intents and entities
+    :param top_intent: the highest ranked intent returned by LUIS
+    :type  top_intent: str
+    :param intents: all returned intents with intent and score
+    :type  intents: pandas dataframe
+    :param self.entities: all returned entities with role, type, text, and score
+    :type  entities: pandas dataframe
+    :param haveintents: did LUIS find matching intent(s) for utterance?
+    :type  haveintents: bool
+    :param haveentities: did LUIS find entities in utterance?
+    :type  haveentities: bool
+    """
 
     def __init__(self):
         config = DefaultConfig()
 
         # TODO: do a check if configured and return a "not set up" message
-        self.runtime_key = config.LUIS_API_KEY  # 'LUIS_RUNTIME_KEY'
-        self.runtime_endpoint = config.LUIS_API_HOST_NAME  # 'LUIS_RUNTIME_ENDPOINT'
-        self.luisAppID = config.LUIS_APP_ID  # 'LUIS_APP_ID'
-        self.luisSlotName = config.LUIS_SLOT  # 'LUIS_APP_SLOT_NAME'
+        self._runtime_key = config.LUIS_API_KEY  # 'LUIS_RUNTIME_KEY'
+        self._runtime_endpoint = config.LUIS_API_HOST_NAME  # 'LUIS_RUNTIME_ENDPOINT'
+        self._luisAppID = config.LUIS_APP_ID  # 'LUIS_APP_ID'
+        self._luisSlotName = config.LUIS_SLOT  # 'LUIS_APP_SLOT_NAME'
         self.top_intent = ""
-        self.intents = []
-        self.sentiment = ""
-        self.entities = []
+        self.intents = pd.DataFrame(columns=['intent', 'score'])
+        self.entities = pd.DataFrame(columns=['role', 'type', 'text', 'score'])
+        self.haveintents = False
+        self.haveentities = False
 
     def predict_rest(self, utterance):
+        """Returns intents and entities for an utterance
+        :param utterance: the utterance to be analysed by LUIS
+        :type utterance: str
+        """
 
         try:
 
             headers = {}
-
             params = {
                 'query': utterance,
                 'timezoneOffset': '0',
@@ -36,46 +52,41 @@ class LuisHelper:
                 'show-all-intents': 'true',
                 'spellCheck': 'false',
                 'staging': 'false',
-                'subscription-key': self.runtime_key
+                'subscription-key': self._runtime_key
             }
 
-            r = requests.get(f'{self.runtime_endpoint}/luis/prediction/v3.0/apps/{self.luisAppID}/slots/production/predict',
-                             headers=headers, params=params)
-            print(r.json())
-            return r.json()
+            r = requests.get(
+                f'{self._runtime_endpoint}/luis/prediction/v3.0/apps/{self._luisAppID}/slots/production/predict',
+                headers=headers, params=params)
+
+            result = r.json()
+            print(result)
+
+            # get all intents and scores
+            if len(result['prediction']['intents']) > 0:
+                self.top_intent = result['prediction']['topIntent']
+                row = 0
+                for intent in result['prediction']['intents']:
+                    list = [intent, result['prediction']['intents'][intent]['score']]
+                    self.intents.loc[row] = list
+                    row += 1
+                self.intents.sort_values(by=['score'], inplace=True, ascending=False)
+                self.top_intent = result['prediction']['topIntent']
+                self.haveintents = True
+                print(self.top_intent)
+
+            # get all entities and scores
+            if len(result['prediction']['entities']['$instance']) > 0:
+                row = 0
+                for role in result['prediction']['entities']['$instance']:
+                    for entity in result['prediction']['entities']['$instance'][role]:
+                        list = [entity['role'], entity['type'], entity['text'], entity['score']]
+                        self.entities.loc[row] = list
+                        row += 1
+                self.haveentities = True
+                self.entities.sort_values(by=['score'], inplace=True, ascending=False)
+                print(self.entities)
 
         except Exception as e:
+            # TODO: return better error tracking
             print(f'{e}')
-
-
-    def predict(self, utterance):
-        # TODO: Better error trapping with messaging in the bot
-
-        # Instantiate a LUIS runtime client
-        clientruntime = LUISRuntimeClient(self.runtime_endpoint, CognitiveServicesCredentials(self.runtime_key))
-
-        request = {"query": utterance}
-
-        # Note be sure to specify, using the slot_name parameter, whether your application is in staging or production.
-        response = clientruntime.prediction.get_slot_prediction(app_id=self.luisAppID, slot_name=self.luisSlotName,
-                                                                prediction_request=request, verbose=True,
-                                                                show_all_intents=True)
-
-        if len(response.prediction.intents) > 0:
-            self.intents = response.prediction.intents
-            self.top_intent = response.prediction.top_intent
-            self.sentiment = response.prediction.sentiment
-
-        if len(response.prediction.entities) > 0:
-            self.entities = response.prediction.entities['subject']
-            print(self.entities)
-
-        print("Top intent: {}".format(response.prediction.top_intent))
-        print("Sentiment: {}".format(response.prediction.sentiment))
-        print("Intents: ")
-
-        for intent in response.prediction.intents:
-            print("\t{}".format(json.dumps(intent)))
-
-        for entity in self.entities:
-            print(f"Entity: {entity}")

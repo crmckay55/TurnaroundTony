@@ -6,28 +6,44 @@ import json, requests
 
 
 class CogSearchHelper:
+    """connects to congitive services and stores results from search term
+    :param results: datafame of results with url, title, keywords, description, tasks, RowKey, and @search.score
+    :type results: pandas dataframe
+    """
 
     def __init__(self):
         config = DefaultConfig
 
-        self.runtime_key = config.COG_SEARCH_KEY
-        self.runtime_endpoint = config.COG_SEARCH_HOST_NAME
-        self.runtime_version = config.COG_SEARCH_VERSION
-        self.runtime_index = config.COG_SEARCH_INDEX
-        self.headers = {'Content-Type': 'application/json',
-                        'api-key': self.runtime_key}
+        self._runtime_key = config.COG_SEARCH_KEY
+        self._runtime_endpoint = config.COG_SEARCH_HOST_NAME
+        self._runtime_version = config.COG_SEARCH_VERSION
+        self._runtime_index = config.COG_SEARCH_INDEX
+        self._headers = {'Content-Type': 'application/json',
+                         'api-key': self._runtime_key}
         self.results = pd.DataFrame()
 
-    def search(self, terms):
-        """terms: list of terms to search for"""
+    def search(self, term: str):
+        """Uses cognitive search to find items with terms
+        :param term: term to search for
+        :type term: str
+        """
 
-        for search_term in terms:
-            url = self.runtime_endpoint + self.runtime_index + "?api-version=" \
-                  + self.runtime_version + "&search=" + search_term
+        found_docs = False
+        df = pd.DataFrame()
 
-            print(url)
-            response = requests.get(url, headers=self.headers)
-            index_list = response.json()
-            print(index_list)
+        print('Search Terms')
+        print(term)
 
-            self.results = pd.json_normalize(index_list['value'])
+        url = self._runtime_endpoint + self._runtime_index + "?api-version=" \
+              + self._runtime_version + "&search=" + term
+
+        response = requests.get(url, headers=self._headers)
+        index_list = response.json()
+        print(index_list)
+
+        df = pd.json_normalize(index_list['value'])
+        self.results = self.results.append(df, ignore_index=True)
+        if len(self.results) > 0:
+            found_docs = True
+
+        return found_docs

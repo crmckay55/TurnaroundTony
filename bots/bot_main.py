@@ -7,6 +7,7 @@ from helpers.luis import LuisHelper
 from helpers.cogsearch import CogSearchHelper
 
 
+
 class MyBot(ActivityHandler):
     # See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
 
@@ -15,21 +16,23 @@ class MyBot(ActivityHandler):
         await turn_context.send_activity(f"You said '{turn_context.activity.text}'")
 
         lh = LuisHelper()
-        lh.predict(turn_context.activity.text)
-        await turn_context.send_activity(f"REST: {lh.predict_rest(turn_context.activity.text)}")
-        # await turn_context.send_activity(f"The top intent was: {lh.top_intent}")
-        # await turn_context.send_activity(f"Your Sentiment was: {lh.sentiment}")
-        # await turn_context.send_activity(f"And entities are: {lh.entities}")
-        # TODO: Better error trapping, and handling of different bots and helpers
-
         cs = CogSearchHelper()
 
-        cs.search(lh.entities)
+        # TODO: seperate out document search bot.  send utterance to LUIS and call correct bot based on intent!
+        lh.predict_rest(turn_context.activity.text)
 
-
-        for idx, row in cs.results.iterrows():
-            await turn_context.send_activity(f"Title : {row['title']}")
-            await turn_context.send_activity(f"URL : {row['url']}")
+        if not lh.haveintents:
+            await turn_context.send_activity('I don\'t understand your question!')
+        elif not lh.haveentities:
+            await turn_context.send_activity('I wasn\'t able to extract your search terms.')
+        else:
+            for idx, entity in lh.entities.iterrows():
+                if not cs.search(entity['text']):
+                    await turn_context.send_activity(f"I can\'t find documents about {entity['text']}")
+                else:
+                    await turn_context.send_activity(f"I found these documents about {entity['text']}")
+                    for idx, result in cs.results.iterrows():
+                        await turn_context.send_activity(f"[{result['title']}]({result['url']})")
 
     async def on_members_added_activity(
             self,
