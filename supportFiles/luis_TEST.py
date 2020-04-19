@@ -1,6 +1,4 @@
-from helpers.luis import LuisHelper
-from config import DefaultConfig
-
+from skills.luis_service import LuisHelper
 
 luis = LuisHelper()
 

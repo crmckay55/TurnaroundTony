@@ -3,9 +3,8 @@
 
 from botbuilder.core import ActivityHandler, TurnContext
 from botbuilder.schema import ChannelAccount
-from helpers.luis import LuisHelper
-from helpers.cogsearch import CogSearchHelper
-
+from skills.luis_service import LuisHelper
+from bots.bot_finddocuments import BotFindDocs
 
 
 class MyBot(ActivityHandler):
@@ -16,23 +15,14 @@ class MyBot(ActivityHandler):
         await turn_context.send_activity(f"You said '{turn_context.activity.text}'")
 
         lh = LuisHelper()
-        cs = CogSearchHelper()
 
-        # TODO: seperate out document search bot.  send utterance to LUIS and call correct bot based on intent!
-        lh.predict_rest(turn_context.activity.text)
+        if lh.predict(turn_context.activity.text):
+            if lh.top_intent == 'search_stagingdocs':
+                await BotFindDocs.find_docs(turn_context, lh)
+            else:
+                await turn_context.send_activity('My overlords have not trained me yet to understand your message.')
 
-        if not lh.haveintents:
-            await turn_context.send_activity('I don\'t understand your question!')
-        elif not lh.haveentities:
-            await turn_context.send_activity('I wasn\'t able to extract your search terms.')
-        else:
-            for idx, entity in lh.entities.iterrows():
-                if not cs.search(entity['text']):
-                    await turn_context.send_activity(f"I can\'t find documents about {entity['text']}")
-                else:
-                    await turn_context.send_activity(f"I found these documents about {entity['text']}")
-                    for idx, result in cs.results.iterrows():
-                        await turn_context.send_activity(f"[{result['title']}]({result['url']}) - score: {result['@search.score']}")
+        lh = None
 
     async def on_members_added_activity(
             self,

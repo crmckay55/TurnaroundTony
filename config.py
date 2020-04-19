@@ -21,6 +21,8 @@ class DefaultConfig:
 
     COG_SEARCH_KEY = os.environ.get("CogSearchKey", "")
     COG_SEARCH_HOST_NAME = os.environ.get("CogSearchHostName", "")
+
     COG_SEARCH_VERSION = '2019-05-06'
-    COG_SEARCH_INDEX = 'indexes/azuretable-index/docs'
+    COG_SEARCH_INDEX = os.environ.get("CogSearchIndexName", "")
+    # TODO: need easier ways to set parameters, at least on Azure
 

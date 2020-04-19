@@ -6,8 +6,10 @@ import json, requests
 
 
 class CogSearchHelper:
-    """connects to congitive services and stores results from search term
-    :param results: datafame of results with url, title, keywords, description, tasks, RowKey, and @search.score
+    """
+    Connects to cognitive services and stores results from search term.
+
+    :param self.results: datafame of results with url, title, keywords, description, tasks, RowKey, and @search.score
     :type results: pandas dataframe
     """
 
@@ -17,19 +19,23 @@ class CogSearchHelper:
         self._runtime_key = config.COG_SEARCH_KEY
         self._runtime_endpoint = config.COG_SEARCH_HOST_NAME
         self._runtime_version = config.COG_SEARCH_VERSION
-        self._runtime_index = config.COG_SEARCH_INDEX
+        self._runtime_index = f'indexes/{config.COG_SEARCH_INDEX}/docs'
         self._headers = {'Content-Type': 'application/json',
                          'api-key': self._runtime_key}
         self.results = pd.DataFrame()
+        self.has_documents = False
 
     def search(self, term: str):
-        """Uses cognitive search to find items with terms
+        """
+        Uses cognitive search to find items with terms
+
         :param term: term to search for
         :type term: str
         """
 
-        found_docs = False
-        df = pd.DataFrame()
+        # TODO: pass term and role so we know what to search
+
+        self.has_documents = False
 
         print('Search Terms')
         print(term)
@@ -43,9 +49,20 @@ class CogSearchHelper:
 
         df = pd.json_normalize(index_list['value'])
         self.results = self.results.append(df, ignore_index=True)
+
         if len(self.results) > 0:
-            found_docs = True
+            self.has_documents = True
 
-        # TODO: seperate searching for task number vs. subject
+        # TODO: Need to handle different roles and limit search types
+        # TODO: separate searching for task number vs. subject
+        # $filter=tasks eq '1.1.2'
+        # &search=*&%24filter=tasks%20eq%20'1.1.2'
+        # can also have search term if present
 
-        return found_docs
+        return self.has_documents
+
+    def _search_tasks_only(self):
+        pass
+
+    def _search_default(self):
+        pass
