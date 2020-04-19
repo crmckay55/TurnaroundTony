@@ -25,23 +25,27 @@ class CogSearchHelper:
         self.results = pd.DataFrame()
         self.has_documents = False
 
-    def search(self, term: str):
+    def search_staging_docs(self, term: str, role: str):
         """
         Uses cognitive search to find items with terms
 
         :param term: term to search for
         :type term: str
+        :param role: role to determine which search string
+        :type role: str
         """
-
-        # TODO: pass term and role so we know what to search
 
         self.has_documents = False
 
-        print('Search Terms')
-        print(term)
+        print(f'Search Term: {term}')
+        print(f'Search Role: {role}')
 
-        url = self._runtime_endpoint + self._runtime_index + "?api-version=" \
-              + self._runtime_version + "&search=" + term
+        url = self._runtime_endpoint + self._runtime_index + "?api-version=" + self._runtime_version
+
+        if role == 'subject':
+            url += "&search=" + term
+        elif role == 'task':
+            url += f"&search=*&%24filter=tasks%20eq%20'{term}'"
 
         response = requests.get(url, headers=self._headers)
         index_list = response.json()
@@ -52,12 +56,6 @@ class CogSearchHelper:
 
         if len(self.results) > 0:
             self.has_documents = True
-
-        # TODO: Need to handle different roles and limit search types
-        # TODO: separate searching for task number vs. subject
-        # $filter=tasks eq '1.1.2'
-        # &search=*&%24filter=tasks%20eq%20'1.1.2'
-        # can also have search term if present
 
         return self.has_documents
 

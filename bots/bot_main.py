@@ -18,7 +18,7 @@ class MyBot(ActivityHandler):
 
         if lh.predict(turn_context.activity.text):
             if lh.top_intent == 'search_stagingdocs':
-                await BotFindDocs.find_docs(turn_context, lh)
+                await BotFindDocs.search_staging_docs(turn_context, lh)
             else:
                 await turn_context.send_activity('My overlords have not trained me yet to understand your message.')
 

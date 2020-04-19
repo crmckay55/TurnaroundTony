@@ -4,7 +4,7 @@ from skills.cogsearch import CogSearchHelper
 csh = CogSearchHelper()
 
 
-csh.search(['org chart'])
+csh.search_staging_docs(['org chart'])
 
 
 for idx, row in csh.results.iterrows():
