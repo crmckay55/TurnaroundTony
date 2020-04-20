@@ -1,6 +1,6 @@
 from botbuilder.core import ActivityHandler, TurnContext
-from skills.luis_service import LuisHelper
-from skills.cogsearch import CogSearchHelper
+from helpers.luis_service import LuisHelper
+from helpers.cogsearch import CogSearchHelper
 
 
 class BotFindDocs(ActivityHandler):
@@ -16,14 +16,12 @@ class BotFindDocs(ActivityHandler):
         """
         cs = CogSearchHelper()
 
-        print(lh.entities)
-
         if lh.has_entities:
             for search_term, search_role in zip(lh.entities['text'], lh.entities['role']):
                 if not cs.search_staging_docs(search_term, search_role):
                     await turn_context.send_activity(f"I can\'t find documents about {search_term}")
                 else:
-                    await turn_context.send_activity(f"I found these documents about {search_term}")
+                    await turn_context.send_activity(f"I found these documents about {search_role} {search_term}")
                     for title, url, score in zip(cs.results['title'],
                                                  cs.results['url'],
                                                  cs.results['@search.score']):

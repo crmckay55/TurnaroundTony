@@ -3,7 +3,7 @@
 
 from botbuilder.core import ActivityHandler, TurnContext
 from botbuilder.schema import ChannelAccount
-from skills.luis_service import LuisHelper
+from helpers.luis_service import LuisHelper
 from bots.bot_finddocuments import BotFindDocs
 
 

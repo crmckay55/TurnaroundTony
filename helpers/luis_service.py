@@ -42,6 +42,7 @@ class LuisHelper:
         """Returns intents and entities for an utterance
         :param utterance: the utterance to be analysed by LUIS
         :type utterance: str
+        :return has_intents: if intents are found returns TRUE
         """
         self.has_intents = False
         self.has_entities = False
@@ -64,10 +65,10 @@ class LuisHelper:
                 headers=headers, params=params)
 
             data = json.loads(r.content)
-            content = json.dumps(data, indent=2)
+            # content = json.dumps(data, indent=2)  # for debug print of content
 
             # get all intents and scores
-            if len(data['prediction']['intents']) > 0:
+            if data['prediction']['intents']:
                 for intent in data['prediction']['intents']:
                     this_item = {'intent': intent, 'score': data['prediction']['intents'][intent]['score']}
                     self.intents = self.intents.append(this_item, ignore_index=True)
@@ -78,7 +79,7 @@ class LuisHelper:
                 print(self.intents)
 
             # get all entities and scores
-            if len(data['prediction']['entities']['$instance']) > 0:
+            if data['prediction']['entities']['$instance']:
                 for role in data['prediction']['entities']['$instance']:
                     for entity in data['prediction']['entities']['$instance'][role]:
                         this_item = {'role': entity['role'], 'type': entity['type'], 'text': entity['text'],

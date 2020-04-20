@@ -1,4 +1,4 @@
-from skills.luis_service import LuisHelper
+from helpers.luis_service import LuisHelper
 
 luis = LuisHelper()
 

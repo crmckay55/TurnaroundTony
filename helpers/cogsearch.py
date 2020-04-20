@@ -33,9 +33,12 @@ class CogSearchHelper:
         :type term: str
         :param role: role to determine which search string
         :type role: str
+        :return self.has_results: bool if results were found
+        :type self.has_results: bool
         """
 
         self.has_documents = False
+        self.results = self.results.iloc[0:0]
 
         print(f'Search Term: {term}')
         print(f'Search Role: {role}')
@@ -49,12 +52,11 @@ class CogSearchHelper:
 
         response = requests.get(url, headers=self._headers)
         index_list = response.json()
-        print(index_list)
 
         df = pd.json_normalize(index_list['value'])
         self.results = self.results.append(df, ignore_index=True)
 
-        if len(self.results) > 0:
+        if not self.results.empty:
             self.has_documents = True
 
         return self.has_documents

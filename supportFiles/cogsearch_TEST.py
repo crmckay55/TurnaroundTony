@@ -1,4 +1,4 @@
-from skills.cogsearch import CogSearchHelper
+from helpers.cogsearch import CogSearchHelper
 
 
 csh = CogSearchHelper()
