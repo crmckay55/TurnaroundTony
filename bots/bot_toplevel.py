@@ -7,7 +7,7 @@ from helpers.luis_service import LuisHelper
 from bots.bot_finddocuments import BotFindDocs
 
 
-class MyBot(ActivityHandler):
+class TopLevelBot(ActivityHandler):
     # See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
 
     async def on_message_activity(self, turn_context: TurnContext):
@@ -16,11 +16,14 @@ class MyBot(ActivityHandler):
 
         lh = LuisHelper()
 
-        if lh.predict(turn_context.activity.text):
+        # TODO: this top level bot need to handle routing of different intents
+        if lh.predict_utterance(turn_context.activity.text):
             if lh.top_intent == 'search_stagingdocs':
                 await BotFindDocs.search_staging_docs(turn_context, lh)
-            else:
+            elif lh.top_intent == "None":
                 await turn_context.send_activity('My overlords have not trained me yet to understand your message.')
+            else:
+                await turn_context.send_activity('Something REALLY went wrong and I can\'t understand you!')
 
         lh = None
 

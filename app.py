@@ -1,6 +1,7 @@
-
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
+# TODO: move this to a top level bot and have app.py call it.
 
 import sys
 import traceback
@@ -16,7 +17,7 @@ from botbuilder.core import (
 from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots.bot_main import MyBot
+from bots.bot_toplevel import TopLevelBot
 
 
 from config import DefaultConfig
@@ -60,7 +61,7 @@ async def on_error(context: TurnContext, error: Exception):
 ADAPTER.on_turn_error = on_error
 
 # Create the Bot
-BOT = MyBot()
+BOT = TopLevelBot()
 
 
 # Listen for incoming requests on /api/messages

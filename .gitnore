@@ -1,0 +1,8 @@
+# ignore virtual environment libraries
+/venv/
+
+# ignore supportFiles folder
+/supportFiles/
+
+# ingore .idea folder
+/.idea/
