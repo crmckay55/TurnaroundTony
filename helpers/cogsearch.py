@@ -46,6 +46,8 @@ class CogSearchHelper:
         #       Weighting to use: str
         #       pass in dataframe and iterate??
 
+        # TODO: return error if not configured!!
+
 
         print(f'Search: {role}, {term}')
 

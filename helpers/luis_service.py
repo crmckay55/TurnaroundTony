@@ -29,6 +29,8 @@ class LuisHelper:
         self.__runtime_endpoint = __config.LUIS_API_HOST_NAME  # 'LUIS_RUNTIME_ENDPOINT'
         self.__luisAppID = __config.LUIS_APP_ID  # 'LUIS_APP_ID'
         self.__luisSlotName = __config.LUIS_SLOT  # 'LUIS_APP_SLOT_NAME'
+        # TODO: return error if not configured!!
+
         self.top_intent = ""
         self.intents = pd.DataFrame(columns=['intent', 'score'])
         self.entities = pd.DataFrame(columns=['role', 'type', 'text', 'score'])

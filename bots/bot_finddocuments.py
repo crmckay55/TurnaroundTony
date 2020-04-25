@@ -28,6 +28,7 @@ class BotFindDocs(ActivityHandler):
                 # TODO: when making cogsearch more generic, may need method in here to set up
                 #       all the parameters to pass to cs.search_staging_docs.  dataframe pass??
 
+
                 if not cs.search_staging_docs(search_term, search_role):
                     await turn_context.send_activity(f"I can\'t find documents about {search_role} {search_term}")
 
