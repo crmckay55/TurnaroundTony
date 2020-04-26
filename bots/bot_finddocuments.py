@@ -8,7 +8,7 @@ class BotFindDocs(ActivityHandler):
     @staticmethod
     async def search_staging_docs(turn_context: TurnContext, lh: LuisHelper):
         """
-        Searches for staging plandocuments and returns the titles with URL formatting, and the score.
+        Searches for staging plan documents and returns the titles with URL formatting, and the score.
         The search is based on task number and/or search term/subject.
 
         :param turn_context: passed turn context so bot can message from here
@@ -25,11 +25,16 @@ class BotFindDocs(ActivityHandler):
         else:
             for search_term, search_role in zip(lh.entities['text'],
                                                 lh.entities['role']):
-                # TODO: when making cogsearch more generic, may need method in here to set up
-                #       all the parameters to pass to cs.search_staging_docs.  dataframe pass??
 
-
-                if not cs.search_staging_docs(search_term, search_role):
+                if search_role == 'task':
+                    filter_field = 'tasks'
+                    filter_term = search_term
+                    search_value = ''
+                else:
+                    filter_field = ''
+                    filter_term = ''
+                    search_value = search_term
+                if not cs.search_staging_docs(filter_term, filter_field, search_value):
                     await turn_context.send_activity(f"I can\'t find documents about {search_role} {search_term}")
 
                 else:

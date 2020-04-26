@@ -1,8 +1,6 @@
-from msrest.authentication import CognitiveServicesCredentials
 from config import DefaultConfig
 import pandas as pd
-
-import json, requests
+import requests
 
 
 class CogSearchHelper:
@@ -21,44 +19,46 @@ class CogSearchHelper:
         self.__runtime_version = config.COG_SEARCH_VERSION
         self.__runtime_index = f'indexes/{config.COG_SEARCH_INDEX}/docs'
         self.__headers = {'Content-Type': 'application/json',
-                         'api-key': self.__runtime_key}
+                          'api-key': self.__runtime_key}
         self.results = pd.DataFrame()
 
-    def search_staging_docs(self, term: str, role: str) -> bool:
+    def search_staging_docs(self,
+                            filter_term: str,
+                            filter_field: str,
+                            search_term: str) -> bool:
         """
-        Uses cognitive search to find items with terms.
+        Uses cognitive search to find a search term, and then apply a filter.
 
-        :param term: term to search for
-        :type term: str
-        :param role: role to determine which field should be searched
-        :type role: str
+        :param filter_field: what field should be filtered?  blank if none
+        :type filter_field: str
+        :param filter_term: what is the filter value for the filter field
+        :type filter_term: str
+        :param search_term: term to search for.  if blank, wildcard used
+        :type search_term: str
         :return: Are there documents found?
         :rtype: bool
         """
 
         self.results = self.results.iloc[0:0]
 
-        # TODO: make more generic so the type of search is passed through as well as the
-        #       terms.  e.g. do we want to filter, search, by what field etc.  Have to
-        #       make this be flexible for any document search. Ideas:
-        #       Search term: str
-        #       Filter term: str  Filter field: str
-        #       Weighting to use: str
-        #       pass in dataframe and iterate??
+        # TODO: return error if not configured
 
-        # TODO: return error if not configured!!
+        print(f'Search: {filter_field}, {filter_term}, {search_term}')
 
-
-        print(f'Search: {role}, {term}')
-
+        # base url
         url = self.__runtime_endpoint + self.__runtime_index + "?api-version=" + self.__runtime_version
 
-        # TODO: make this a seperate method to build up url based on params passed in!
-        if role == 'subject':
-            url += "&search=" + term
-        elif role == 'task':
-            url += f"&search=*&%24filter=tasks%20eq%20'{term}'"
+        # if blank, wild card
+        if search_term == '':
+            url += "&search=*"
+        else:
+            url += "&search=" + search_term
 
+        # add filter if present
+        if filter_field != '':
+            url += f"&%24filter={filter_field}%20eq%20'{filter_term}'"
+
+        # TODO: wrap in try and raise error
         response = requests.get(url, headers=self.__headers)
         index_list = response.json()
 
